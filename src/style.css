@@ -5,3 +5,40 @@
 @media(max-width:800px){aside{display:none}.topbar{padding:0 16px;gap:12px}.brand{min-width:0}.brand-type{font-size:16px}.file-name{display:none}.workbar,.toolbar{padding-left:14px;padding-right:14px}.tool-set button[data-format=mermaid],.tool-set button[data-format=plantuml]{font-size:10px}footer div{gap:9px}}
 @media(max-width:600px){.topbar{height:58px}.brand-type{font-size:14px}.brand-type sup{display:none}.header-actions{margin-left:auto}.header-actions #open,.header-actions #theme,.header-actions .divider{display:none}.primary{padding:8px 10px}.workbar{height:54px}.segmented button{padding:7px 8px;font-size:11px}.work-actions #spell,.work-actions #focus{display:none}.toolbar{overflow:auto;padding-right:10px}.toolbar .divider{margin:0 4px}.toolbar .tool-set{flex:none}#math-engine{display:none}.panes[data-view=split] .editor-pane{display:none}.panes[data-view=split] .preview-pane{display:flex}.pane-head{padding:0 18px}.markdown-body{padding:26px 22px 80px;font-size:14px}.markdown-body h1{font-size:27px}footer #chars,footer #reading,footer div:last-child span:not(:first-child){display:none}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}}
+
+/* Refined icon controls, popovers and mobile escape route */
+.ico{display:inline-flex;align-items:center;justify-content:center}
+.ico svg,.side-heading svg,.outline-heading svg,.file-icon svg,.side-active svg,.segmented svg,.tool-set svg,.primary svg,.setting-button svg{display:block;flex:none}
+.side-active{display:flex;align-items:center;gap:5px}.side-active span{margin-left:auto}
+.segmented button{display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.primary{display:inline-flex;align-items:center;gap:8px;white-space:nowrap}
+.primary svg:last-child{margin-left:7px;transition:transform .2s}
+.primary[aria-expanded=true] svg:last-child{transform:rotate(180deg)}
+.header-actions>button:not(.primary){display:flex;align-items:center;justify-content:center}
+.tool-set button{display:inline-flex;align-items:center;justify-content:center}
+.work-actions button{display:inline-flex;align-items:center;justify-content:center}
+.export-menu{width:260px;padding:8px;right:22px;top:61px;border-radius:11px;box-shadow:0 20px 48px #17231b2b}
+.export-menu small,.setting-heading{display:block;padding:11px 12px 8px;color:var(--muted);font:700 10px 'Segoe UI',sans-serif;letter-spacing:1.2px}
+.export-menu button{display:flex;align-items:center;justify-content:flex-start;gap:12px;min-height:56px;padding:8px 11px}
+.export-menu button>svg{color:var(--accent);flex:none}
+.export-menu button span,.setting-option span{display:flex;flex-direction:column;gap:2px;text-align:left}
+.export-menu button strong,.setting-option strong{font-style:normal;font-size:12px;color:var(--text);font-weight:650}
+.export-menu button em,.setting-option em{font-style:normal;font-size:10px;color:var(--muted)}
+.setting-button{margin-left:auto;display:flex;align-items:center;justify-content:space-between;gap:11px;min-width:95px;height:31px;padding:0 9px;border:1px solid var(--line);border-radius:6px;background:var(--surface);color:var(--text);font-size:11px}
+.setting-button:hover,.setting-button[aria-expanded=true]{border-color:var(--accent);background:var(--accent-light)}
+.setting-button[aria-expanded=true] svg{transform:rotate(180deg)}
+#math-mobile{display:none;font-family:Georgia,serif;font-size:20px;line-height:1}
+.setting-popover{position:fixed;width:238px;padding:6px;background:var(--surface);border:1px solid var(--line);border-radius:10px;box-shadow:0 18px 42px #17231b30;z-index:40}
+.setting-heading.secondary{border-top:1px solid var(--line);margin-top:5px;padding-top:14px}
+.setting-option{width:100%;border:0;background:none;border-radius:6px;display:flex;align-items:center;justify-content:space-between;padding:9px 11px;min-height:48px;color:var(--accent)}
+.setting-option:hover,.setting-option.chosen{background:var(--button)}
+.setting-option.chosen strong{color:var(--accent)}
+#zen-exit{display:none;position:fixed;z-index:60;top:max(12px,env(safe-area-inset-top));right:max(12px,env(safe-area-inset-right));align-items:center;gap:8px;padding:9px 12px;background:#2d453a;color:#fff;border:1px solid #fff3;border-radius:8px;box-shadow:0 8px 22px #0003;font-size:12px;font-weight:650}
+.zen #zen-exit{display:flex}
+.zen #zen-exit:hover{background:#395a49}
+:root[data-preview-font=sans] .markdown-body{font-family:'Segoe UI',Arial,sans-serif}
+:root[data-preview-font=mono] .markdown-body{font-family:Consolas,'Courier New',monospace}
+:root[data-editor-font=sans] #editor{font-family:'Segoe UI',Arial,sans-serif;font-size:14px}
+:root[data-editor-font=sans] #lines{font-size:14px}
+@media(max-width:800px){.work-actions #spell,.work-actions #focus{display:none}.work-actions #font-button,.work-actions #math-mobile{display:flex}.work-actions #font-button .button-label{display:none}.work-actions #zen .button-label{display:none}.segmented button{gap:4px}}
+@media(max-width:600px){.topbar{gap:8px}.brand-mark{width:31px;height:31px;font-size:21px}.brand-type{font-size:13px}.primary{padding:9px;gap:5px;font-size:12px}.primary svg:last-child{margin-left:0}.header-actions #open,.header-actions #theme{display:flex}.header-actions #open,.header-actions #theme{width:30px;padding:0}.header-actions .divider{display:none}.workbar{padding:0 10px;gap:8px}.segmented button{padding:8px 6px;font-size:10px;gap:4px}.segmented button svg{width:13px;height:13px}.work-actions{gap:0}.work-actions button{padding:0 5px}.toolbar{gap:2px}.setting-button{min-width:76px}.export-menu{right:9px;top:52px}}

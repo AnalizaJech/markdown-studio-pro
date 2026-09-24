@@ -2,6 +2,8 @@
 
 Editor Markdown local con vista previa, vista dividida, Mermaid, ecuaciones KaTeX y MathJax, tablas, índice, modos oscuro, concentración y zen, corrección ortográfica del navegador, estadísticas y exportación.
 
+Los controles de exportación, motor matemático y tipografía usan menús propios. «Tipografías» permite elegir la fuente de lectura y la del editor; las preferencias se guardan en el navegador. En móvil, el modo Zen muestra siempre el botón «Salir de Zen».
+
 ## Ejecutar
 
 ```powershell
