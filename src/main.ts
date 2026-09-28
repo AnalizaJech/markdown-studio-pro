@@ -64,7 +64,8 @@ const paths:Record<string,string> = {
  editor:'<path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L9 17l-4 1 1-4Z"/>',
  split:'<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M12 4v16"/>',
  preview:'<path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/>',
- focus:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/>',
+ focus:'<path d="M4 4h5M4 4v5m16-5h-5m5 0v5M4 20h5m-5 0v-5m16 5h-5m5 0v-5M9 9h6v6H9z"/>',
+ offline:'<path d="M8 3h8v6H8zM9 3V1m6 2V1M12 9v12m-5-4h10"/>',
  zen:'<path d="M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5"/>',
  shrink:'<path d="M8 8 3 3m5 5V3M8 8H3m13 0 5-5m-5 5V3m0 5h5M8 16l-5 5m5-5v5m0-5H3m13 0 5 5m-5-5v5m0-5h5"/>',
  check:'<path d="m4 12 5 5L20 6"/>',
@@ -89,8 +90,9 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
   <div id="export-menu" class="export-menu hidden" role="menu" aria-label="Exportar documento"><small>EXPORTAR DOCUMENTO</small><button type="button" role="menuitem" data-export="pdf">${ico('print')}<span><strong>PDF</strong><em>Imprimir o guardar</em></span></button><button type="button" role="menuitem" data-export="docx">${ico('file')}<span><strong>Documento Word</strong><em>Archivo .docx</em></span></button><button type="button" role="menuitem" data-export="html">${ico('code')}<span><strong>HTML</strong><em>Página independiente</em></span></button><button type="button" role="menuitem" data-export="md">${ico('download')}<span><strong>Markdown</strong><em>Archivo .md</em></span></button></div>
  </header>
  <div class="workspace">
-  <aside id="sidebar"><div class="side-heading">WORKSPACE <button id="side-toggle" aria-label="Collapse sidebar">${ico('menu',16)}</button></div><div class="side-active">${ico('file',16)} &nbsp; Document <span>•</span></div><div class="outline-heading">OUTLINE <button id="outline-toggle" aria-label="Toggle outline">${ico('chevron',15)}</button></div><nav id="toc" aria-label="Table of contents"></nav><div class="sidebar-foot"><div><i></i> Available offline</div><small>STUDIO PRO <span>v1.0</span></small></div></aside>
+  <aside id="sidebar"><div class="side-heading">WORKSPACE</div><div class="side-active">${ico('file',16)} &nbsp; Document <span>${ico('check',14)}</span></div><div class="outline-heading">OUTLINE <button id="outline-toggle" aria-label="Toggle outline">${ico('chevron',15)}</button></div><nav id="toc" aria-label="Table of contents"></nav><div class="sidebar-foot"><div>${ico('offline',15)} Available offline</div><small>STUDIO PRO <span>v1.0</span></small></div></aside>
   <main>
+   <button id="side-toggle" type="button" aria-label="Ocultar panel lateral" title="Ocultar panel lateral" aria-controls="sidebar" aria-expanded="true">${ico('menu',18)}</button>
    <div class="workbar"><div class="segmented"><button data-view="editor">${ico('editor',15)} <span>Editor</span></button><button data-view="split">${ico('split',15)} <span>Dividida</span></button><button data-view="preview">${ico('preview',15)} <span>Vista previa</span></button></div><div class="work-actions">${btn('spell','Ortografía','check')}${btn('focus','Concentración','focus')}<button id="math-mobile" type="button" title="Motor matemático" aria-label="Motor matemático" aria-haspopup="menu" aria-expanded="false">∑</button>${btn('font-button','Tipografías','type','aria-haspopup="menu" aria-expanded="false"')}${btn('zen','Modo Zen','zen')}</div></div>
    <div class="toolbar"><div class="tool-set"><button data-format="heading" title="Encabezado">H₁</button><button data-format="bold" title="Negrita (Ctrl+B)"><b>B</b></button><button data-format="italic" title="Cursiva (Ctrl+I)"><i>I</i></button><button data-format="strike" title="Tachado"><s>S</s></button></div><span class="divider"></span><div class="tool-set"><button data-format="link" title="Enlace (Ctrl+K)">${ico('link')}</button><button data-format="list" title="Lista">${ico('list')}</button><button data-format="table" title="Tabla">${ico('table')}</button><button data-format="code" title="Código">${ico('code')}</button></div><span class="divider"></span><div class="tool-set"><button data-format="mermaid">Mermaid</button><button data-format="plantuml">PlantUML</button><button data-format="math">∑</button></div><button id="math-button" type="button" class="setting-button" aria-haspopup="menu" aria-expanded="false" title="Motor matemático"><span id="math-label">KaTeX</span>${ico('chevron',14)}</button></div>
    <div id="panes" class="panes"><section class="editor-pane"><div class="pane-head"><span><i></i> EDITOR</span><span>MARKDOWN</span></div><div class="edit-surface"><div id="lines"></div><textarea id="editor" aria-label="Markdown editor" spellcheck="true"></textarea></div></section><section class="preview-pane"><div class="pane-head"><span><i></i> PREVIEW</span><span>LIVE RENDER</span></div><div class="preview-scroll"><article id="preview" class="markdown-body"></article></div></section></div>
@@ -102,6 +104,9 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
 <div id="setting-popover" class="setting-popover hidden" role="menu"></div>`
 const $ = <T extends Element=HTMLElement>(s:string) => document.querySelector<T>(s)!
 const editor=$<HTMLTextAreaElement>('#editor'), preview=$('#preview'), panes=$('#panes'), toc=$('#toc')
+$('.editor-pane .pane-head span').innerHTML=ico('editor',15)+' EDITOR'
+$('.preview-pane .pane-head span').innerHTML=ico('preview',15)+' PREVIEW'
+$('.ready').innerHTML=ico('check',13)+' Ready'
 editor.value=localStorage.getItem('msp-text')??starter
 const md=new MarkdownIt({html:false,linkify:true,typographer:true,breaks:true})
 const baseFence=md.renderer.rules.fence!
@@ -110,7 +115,7 @@ md.renderer.rules.fence=(tokens,i,options,env,self)=>{
  if(lang==='mermaid'||lang==='plantuml') return `<div class="diagram" data-lang="${lang}" data-src="${encodeURIComponent(tokens[i].content)}"><div class="diagram-title">${lang.toUpperCase()}</div><div class="diagram-out"></div></div>`
  return baseFence(tokens,i,options,env,self)
 }
-md.renderer.rules.heading_open=(tokens,i,options,_env,self)=>{tokens[i].attrSet('id',slug(tokens[i+1]?.content||''));return self.renderToken(tokens,i,options)}
+md.renderer.rules.heading_open=(tokens,i,options,_env,self)=>{const line=tokens[i].map?.[0]??0;tokens[i].attrSet('id',slug(tokens[i+1]?.content||'')+'-'+line);tokens[i].attrSet('data-source-line',String(line));return self.renderToken(tokens,i,options)}
 function plantToMermaid(src:string){
  const lines=src.split('\n').map(x=>x.trim()).filter(x=>x&&!/^@(?:start|end)uml/i.test(x))
  if(lines.some(x=>/^(participant|actor)\s/i.test(x))||lines.some(x=>/\w\s*->\s*\w\s*:/.test(x))){
@@ -122,7 +127,7 @@ function plantToMermaid(src:string){
 }
 function preprocessMath(src:string){
  const items:string[]=[]
- src=src.replace(/\$\$([\s\S]+?)\$\$/g,(_,tex)=>{const i=items.push(`<div class="math-slot display" data-tex="${encodeURIComponent(tex.trim())}" data-display="1"></div>`)-1;return `MSPBLOCK${i}END`})
+ src=src.replace(/\$\$([\s\S]+?)\$\$/g,(all:string,tex:string)=>{const i=items.push(`<div class="math-slot display" data-tex="${encodeURIComponent(tex.trim())}" data-display="1"></div>`)-1;return `MSPBLOCK${i}END`+'\n'.repeat(all.split('\n').length-1)})
  src=src.replace(/(?<!\\)\$([^\n$]+)\$/g,(_,tex)=>{const i=items.push(`<span class="math-slot" data-tex="${encodeURIComponent(tex)}"></span>`)-1;return `MSPINLINE${i}END`})
  return {src,items}
 }
@@ -155,8 +160,22 @@ async function render(){
   try{const src=decodeURIComponent(el.dataset.src||'');const {svg}=await mermaid.render(`msp-${id}-${i}`,el.dataset.lang==='plantuml'?plantToMermaid(src):src);el.querySelector('.diagram-out')!.innerHTML=svg}
   catch(e){el.querySelector('.diagram-out')!.textContent=e instanceof Error?e.message:'Diagram error'}
  }
- toc.innerHTML=[...preview.querySelectorAll('h1,h2,h3,h4')].map(h=>`<a class="level-${h.tagName.toLowerCase()}" href="#${h.id}">${esc(h.textContent||'')}</a>`).join('')||'<span class="empty">No headings yet</span>'
- toc.querySelectorAll('a').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();if(view==='editor')setView('split');preview.querySelector(a.getAttribute('href')!)?.scrollIntoView({behavior:'smooth'})}))
+ toc.innerHTML=[...preview.querySelectorAll<HTMLElement>('h1,h2,h3,h4,h5,h6')].map(h=>`<a class="level-${h.tagName.toLowerCase()}" href="#${h.id}" data-source-line="${h.dataset.sourceLine}">${esc(h.textContent||'')}</a>`).join('')||'<span class="empty">No headings yet</span>'
+ toc.querySelectorAll<HTMLAnchorElement>('a').forEach(a=>a.addEventListener('click',e=>{
+  e.preventDefault()
+  const line=Number(a.dataset.sourceLine),lines=editor.value.split('\n')
+  const start=lines.slice(0,line).reduce((sum,text)=>sum+text.length+1,0)
+  editor.setSelectionRange(start,start+(lines[line]?.length??0))
+  const lineHeight=parseFloat(getComputedStyle(editor).lineHeight)
+  editor.scrollTop=Math.max(0,line*lineHeight-editor.clientHeight/3)
+  editor.scrollLeft=0;$('#lines').scrollTop=editor.scrollTop
+  const heading=document.getElementById(a.hash.slice(1))
+  const scroll=$('.preview-scroll')
+  if(heading)scroll.scrollTop+=heading.getBoundingClientRect().top-scroll.getBoundingClientRect().top-24
+  stats()
+  toc.querySelectorAll('a').forEach(link=>link.classList.toggle('current',link===a))
+  if(window.matchMedia('(max-width:800px)').matches)setSidebar(false)
+ }))
 }
 function stats(){
  const s=editor.value,w=s.trim().match(/[\p{L}\p{N}][\p{L}\p{N}'’-]*/gu)?.length||0
@@ -219,7 +238,10 @@ $('#font-button').addEventListener('click',e=>openPopover('font',e.currentTarget
 document.addEventListener('click',e=>{if(!(e.target as HTMLElement).closest('#setting-popover,#math-button,#math-mobile,#font-button'))closePopover()})
 window.addEventListener('resize',closePopover)
 $('#outline-toggle').addEventListener('click',()=>toc.classList.toggle('hidden'))
-$('#side-toggle').addEventListener('click',()=>document.body.classList.toggle('side-closed'))
+let sidebarOpen=!window.matchMedia('(max-width:800px)').matches
+function setSidebar(open:boolean){sidebarOpen=open;if(open&&focus){focus=false;document.body.classList.remove('focus');$('#focus').classList.remove('active')}document.body.classList.toggle('side-closed',!open);document.body.classList.toggle('side-open',open);$('#side-toggle').setAttribute('aria-expanded',String(open));const label=open?'Ocultar panel lateral':'Mostrar panel lateral';$('#side-toggle').setAttribute('aria-label',label);$('#side-toggle').title=label}
+$('#side-toggle').addEventListener('click',()=>setSidebar(!sidebarOpen))
+setSidebar(sidebarOpen)
 $<HTMLInputElement>('#title').addEventListener('input',e=>{title=(e.target as HTMLInputElement).value||'Untitled document';localStorage.setItem('msp-title',title)})
 $('#open').addEventListener('click',()=>$<HTMLInputElement>('#file-input').click())
 $<HTMLInputElement>('#file-input').addEventListener('change',async e=>{const f=(e.target as HTMLInputElement).files?.[0];if(!f)return;editor.value=await f.text();title=f.name.replace(/\.(md|markdown|txt)$/i,'');$<HTMLInputElement>('#title').value=title;localStorage.setItem('msp-title',title);editor.dispatchEvent(new Event('input'))})

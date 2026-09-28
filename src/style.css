@@ -28,6 +28,17 @@
 .setting-button:hover,.setting-button[aria-expanded=true]{border-color:var(--accent);background:var(--accent-light)}
 .setting-button[aria-expanded=true] svg{transform:rotate(180deg)}
 #math-mobile{display:none;font-family:Georgia,serif;font-size:20px;line-height:1}
+main{position:relative}
+#side-toggle{position:absolute;top:17px;left:14px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;border:0;border-radius:6px;background:transparent;color:var(--muted);z-index:4}
+#side-toggle:hover,#side-toggle[aria-expanded=true]{background:var(--button);color:var(--text)}
+.workbar{padding-left:58px}
+.pane-head span:first-child,.sidebar-foot>div,.ready{display:inline-flex;align-items:center;gap:8px}
+.pane-head svg{color:var(--accent)}.preview-pane .pane-head svg,.sidebar-foot svg{color:#78a38e}
+#toc a.current{background:var(--accent-light);color:var(--accent)}
+.zen #side-toggle{display:none}
+@media(max-width:800px){.workspace{position:relative}.side-open aside{display:flex;position:absolute;top:66px;left:0;bottom:0;width:244px;padding:22px 14px 17px;z-index:15;box-shadow:14px 0 30px #0003}.workbar{padding-left:52px}.focus.side-open aside{display:none}}
+@media(max-width:600px){#side-toggle{top:11px;left:8px}.workbar{padding-left:43px!important;gap:4px!important}.side-open aside{top:54px}.segmented button{padding-left:5px!important;padding-right:5px!important}}
+@media(max-width:380px){.segmented button span{display:none}.segmented button{min-width:32px;height:32px}.topbar{padding-left:10px;padding-right:10px}.brand{gap:6px}.brand-type{font-size:12px}}
 .setting-popover{position:fixed;width:238px;padding:6px;background:var(--surface);border:1px solid var(--line);border-radius:10px;box-shadow:0 18px 42px #17231b30;z-index:40}
 .setting-heading.secondary{border-top:1px solid var(--line);margin-top:5px;padding-top:14px}
 .setting-option{width:100%;border:0;background:none;border-radius:6px;display:flex;align-items:center;justify-content:space-between;padding:9px 11px;min-height:48px;color:var(--accent)}
