@@ -1,4 +1,5 @@
 import './style.css'
+import { registerUpdates } from './updates'
 import 'katex/dist/katex.min.css'
 import MarkdownIt from 'markdown-it'
 import mermaid from 'mermaid'
@@ -277,5 +278,36 @@ async function exportAs(type:string){
 document.querySelectorAll<HTMLButtonElement>('[data-export]').forEach(b=>b.onclick=()=>exportAs(b.dataset.export!))
 document.addEventListener('keydown',e=>{const mod=e.ctrlKey||e.metaKey;if(e.key==='Escape'){setZen(false);closeExport();closePopover()}if(!mod)return;const k=e.key.toLowerCase();if(k==='s'){e.preventDefault();exportAs('md')}else if(k==='o'){e.preventDefault();$<HTMLInputElement>('#file-input').click()}else if(k==='b'){e.preventDefault();format('bold')}else if(k==='i'){e.preventDefault();format('italic')}else if(k==='k'){e.preventDefault();format('link')}else if(k==='1'&&e.altKey){e.preventDefault();format('heading')}else if(k==='\\'){e.preventDefault();setView(view==='split'?'editor':'split')}else if(k==='j'&&e.shiftKey){e.preventDefault();$('#focus').click()}})
 editor.addEventListener('keydown',e=>{if(e.key==='Tab'){e.preventDefault();replace('  ')}else if(e.key==='Enter'){const line=editor.value.slice(0,editor.selectionStart).split('\n').at(-1)||'',m=line.match(/^(\s*(?:[-*+] |\d+\. |> ))/);if(m&&line.trim()!==m[0].trim()){e.preventDefault();replace('\n'+m[1])}}})
-setView(view);applyFonts();document.documentElement.dataset.theme=dark?'dark':'light';stats();render()
-if('serviceWorker'in navigator&&import.meta.env.PROD)navigator.serviceWorker.register(import.meta.env.BASE_URL+'sw.js').catch(()=>{})
+const updateStateKey='markdown-studio-pro-update-state'
+function saveBeforeUpdate(){
+ const snapshot={selectionStart:editor.selectionStart,selectionEnd:editor.selectionEnd,editorTop:editor.scrollTop,editorLeft:editor.scrollLeft,previewTop:$('.preview-scroll').scrollTop,focus,zen,spell,mathEngine,sidebarOpen,tocHidden:toc.classList.contains('hidden')}
+ for(const [key,value] of Object.entries({'msp-text':editor.value,'msp-title':title,'msp-view':view,'msp-dark':String(dark),'msp-preview-font':previewFont,'msp-editor-font':editorFont})){
+  localStorage.setItem(key,value)
+  if(localStorage.getItem(key)!==value)throw new Error('Document storage failed')
+ }
+ const json=JSON.stringify(snapshot)
+ sessionStorage.setItem(updateStateKey,json)
+ if(sessionStorage.getItem(updateStateKey)!==json)throw new Error('State storage failed')
+}
+async function start(){
+ setView(view);applyFonts();document.documentElement.dataset.theme=dark?'dark':'light';stats()
+ let state:ReturnType<typeof JSON.parse>|undefined
+ try {const json=sessionStorage.getItem(updateStateKey);if(json)state=JSON.parse(json)}catch{}
+ if(state){
+  mathEngine=state.mathEngine==='mathjax'?'mathjax':'katex'
+  $('#math-label').textContent=mathEngine==='mathjax'?'MathJax':'KaTeX'
+  spell=state.spell!==false;editor.spellcheck=spell;$('#spell').classList.toggle('active',spell)
+  setSidebar(Boolean(state.sidebarOpen))
+  focus=Boolean(state.focus);document.body.classList.toggle('focus',focus);$('#focus').classList.toggle('active',focus)
+  setZen(Boolean(state.zen));toc.classList.toggle('hidden',Boolean(state.tocHidden))
+ }
+ await render()
+ if(state){
+  editor.setSelectionRange(state.selectionStart,state.selectionEnd)
+  editor.scrollTop=state.editorTop;editor.scrollLeft=state.editorLeft
+  $('#lines').scrollTop=editor.scrollTop;$('.preview-scroll').scrollTop=state.previewTop
+  stats();sessionStorage.removeItem(updateStateKey)
+ }
+ if(import.meta.env.PROD)registerUpdates(import.meta.env.BASE_URL,saveBeforeUpdate)
+}
+start()

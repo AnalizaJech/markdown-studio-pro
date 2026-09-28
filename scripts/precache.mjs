@@ -1,6 +1,8 @@
-import { readdir, writeFile } from 'node:fs/promises'
+import { readdir, readFile, writeFile } from 'node:fs/promises'
+import { createHash } from 'node:crypto'
 import { join, relative } from 'node:path'
 import { fileURLToPath } from 'node:url'
+
 const root = fileURLToPath(new URL('../dist/', import.meta.url))
 async function files(dir) {
   const result = []
@@ -10,5 +12,17 @@ async function files(dir) {
   }
   return result
 }
-const assets = ['./', ...(await files(root)).filter(path => !path.endsWith('sw.js')).map(path => './' + relative(root, path).replaceAll('\\', '/'))]
-await writeFile(join(root, 'sw.js'), `const CACHE='msp-${Date.now()}';const ASSETS=${JSON.stringify(assets)};self.addEventListener('install',event=>{self.skipWaiting();event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(ASSETS)))});self.addEventListener('activate',event=>{event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key!==CACHE).map(key=>caches.delete(key)))));self.clients.claim()});self.addEventListener('fetch',event=>{if(event.request.method!=='GET'||new URL(event.request.url).origin!==self.location.origin)return;event.respondWith(caches.match(event.request).then(cached=>cached||fetch(event.request).then(response=>{if(response.ok){const copy=response.clone();caches.open(CACHE).then(cache=>cache.put(event.request,copy))}return response})))})`)
+const paths = (await files(root)).filter(path => relative(root, path) !== 'sw.js').sort()
+const template = await readFile(new URL('../public/sw.js', import.meta.url), 'utf8')
+const hash = createHash('sha256').update(template)
+const assets = ['./']
+for (const path of paths) {
+  const name = relative(root, path).replaceAll('\\', '/')
+  hash.update(name).update('\0').update(await readFile(path)).update('\0')
+  assets.push('./' + name)
+}
+const version = hash.digest('hex').slice(0, 20)
+await writeFile(join(root, 'sw.js'), template
+  .replace('__BUILD_VERSION__', version)
+  .replace('/* __PRECACHE_MANIFEST__ */ []', JSON.stringify(assets)))
+console.log('Offline build:', version)

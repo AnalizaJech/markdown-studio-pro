@@ -28,6 +28,9 @@
 .setting-button:hover,.setting-button[aria-expanded=true]{border-color:var(--accent);background:var(--accent-light)}
 .setting-button[aria-expanded=true] svg{transform:rotate(180deg)}
 #math-mobile{display:none;font-family:Georgia,serif;font-size:20px;line-height:1}
+.update-notice{position:fixed;bottom:max(46px,env(safe-area-inset-bottom));right:16px;z-index:100;display:flex;align-items:center;gap:14px;max-width:calc(100vw - 32px);padding:12px 15px;border:1px solid var(--line);border-radius:9px;background:var(--surface);color:var(--text);box-shadow:0 8px 28px #0003;font-size:12px}
+.update-notice button{border:0;border-radius:6px;background:#2d453a;color:#fff;padding:8px 12px;font-weight:600}
+.update-notice button:disabled{opacity:.6;cursor:wait}
 main{position:relative}
 #side-toggle{position:absolute;top:17px;left:14px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;border:0;border-radius:6px;background:transparent;color:var(--muted);z-index:4}
 #side-toggle:hover,#side-toggle[aria-expanded=true]{background:var(--button);color:var(--text)}
