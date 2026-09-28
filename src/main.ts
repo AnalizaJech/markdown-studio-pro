@@ -137,8 +137,11 @@ async function mathRender(){
  if(mathEngine==='katex'){slots.forEach(el=>{try{el.innerHTML=katex.renderToString(decodeURIComponent(el.dataset.tex||''),{displayMode:el.dataset.display==='1',throwOnError:false,trust:false})}catch{el.textContent='Invalid equation'}});return}
  const mj=await loadMathJax()
  for(const el of slots){try{const svg=await mj.tex2svgPromise(decodeURIComponent(el.dataset.tex||''),{display:el.dataset.display==='1'});el.replaceChildren(svg)}catch{el.textContent='Invalid equation'}}
+ // Standalone tex2svgPromise conversions do not install page styles. These
+ // include the visual hiding rules for the accessible MathML alternative.
+ mj.startup.document.addStyleSheet()
 }
-type MathJaxAPI={tex2svgPromise:(tex:string,options:{display:boolean})=>Promise<HTMLElement>}
+type MathJaxAPI={tex2svgPromise:(tex:string,options:{display:boolean})=>Promise<HTMLElement>,startup:{document:{addStyleSheet:()=>void}}}
 let mathJaxPromise:Promise<MathJaxAPI>|undefined
 function loadMathJax():Promise<MathJaxAPI>{
  if(!mathJaxPromise)mathJaxPromise=new Promise((resolve,reject)=>{
@@ -258,7 +261,8 @@ async function exportAs(type:string){
  await render()
  const exportFont=previewFont==='sans'?'Arial,sans-serif':previewFont==='mono'?'Consolas,monospace':'Georgia,serif'
  const css=`body{font:16px/1.7 ${exportFont};color:#252923;max-width:820px;margin:50px auto;padding:0 24px}h1,h2,h3{line-height:1.25}h2{border-bottom:1px solid #ddd;padding-bottom:8px}pre{white-space:pre-wrap;background:#f3f4f1;padding:16px}code{background:#f3f4f1}table{border-collapse:collapse;width:100%}th,td{border:1px solid #ddd;padding:8px}blockquote{border-left:3px solid #b98b66;padding-left:20px}.diagram-out{text-align:center}.diagram-title{font:11px sans-serif;color:#777}@page{margin:20mm}`
- const html=`<!doctype html><html><head><meta charset="utf-8"><title>${esc(title)}</title><style>${css}</style></head><body>${preview.innerHTML}</body></html>`
+ const mathStyles=[...document.querySelectorAll('style[id^="MJX-"]')].map(style=>style.textContent||'').join('\n')
+ const html=`<!doctype html><html><head><meta charset="utf-8"><title>${esc(title)}</title><style>${css}\n${mathStyles}</style></head><body>${preview.innerHTML}</body></html>`
  mathEngine=previousEngine
  if((type==='html'||type==='pdf')&&mathEngine!== 'mathjax')render()
  if(type==='html')return download(new Blob([html],{type:'text/html;charset=utf-8'}),'html')
